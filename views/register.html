@@ -3,52 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>传智音乐</title>
-    <link href="/public/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="/public/vender/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="/public/css/icon.css" />
-    <link href="/public/css/common.css" rel="stylesheet" type="text/css" />
-    <link href="/public/css/link.css" rel="stylesheet" type="text/css" />
-    <link href="/public/css/style.css" rel="stylesheet" type="text/css" />
-    <script src="/public/vender/jquery/dist/jquery.js" type="text/javascript"></script>
-    <script src="/public/vender/bootstrap/dist/js/bootstrap.js"></script>
+    {{include './particals/links.html' }}
 
     <style type="text/css">
-         #pwd-level div {
-        height: 30px;
-        width: 30px;
-        display: inline-block;
-        float: left;
-    }
-    
-    #pwd-level span {
-        display: inline-block;
-        float: left;
-    }
+        #pwd-level div {
+            height: 30px;
+            width: 30px;
+            display: inline-block;
+            float: left;
+        }
+
+        #pwd-level span {
+            display: inline-block;
+            float: left;
+        }
     </style>
 </head>
 
 <body>
-    <div class="aw-top-menu-wrap">
-        <div class="container">
-            <!-- 用户栏 -->
-            <div class="aw-user-nav">
-                <a href="" class="aw-user-nav-dropdown">
-                </a>
-                <div class="aw-dropdown dropdown-list pull-right">
-                    <ul class="aw-dropdown-list">
-                        <li><a href="/logout"><i class="icon icon-logout"></i> 退出</a></li>
-                    </ul>
-                </div>
-                <!-- 登陆&注册栏 -->
-                <span>
-        <a class="register btn btn-normal btn-success" href="">注册</a>
-        <a class="login btn btn-normal btn-primary" href="">登录</a>
-      </span>
-                <!-- end 登陆&注册栏 -->
-            </div>
-            <!-- end 用户栏 -->
-        </div>
-    </div>
+    {{include './particals/header.html'}}
     <link href="/public/css/register.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
     </script>
@@ -56,21 +29,23 @@
         <div class="mod-head">
             <a href="/"></a>
             <h1>注册新用户</h1>
+            <h2 id="msg"></h2>
         </div>
         <div class="mod-body">
             <form action="" class="aw-register-form" method="post" id="register_form">
                 <ul>
                     <li class="alert alert-danger hide error_message text-left">
-                        <i class="icon icon-delete"></i> <em></em>
+                        <i class="icon icon-delete"></i>
+                        <em></em>
                     </li>
                     <li>
-                        <input class="aw-register-name form-control" type="text" name="username" placeholder="用户名" value="" />
+                        <input id="name" class="aw-register-name form-control" type="text" name="username" placeholder="用户名" value="" />
                     </li>
                     <li>
                         <input class="aw-register-email form-control" type="text" placeholder="邮箱" name="email" value="" />
                     </li>
                     <li>
-                        <input class="aw-register-pwd form-control" type="password" name="password" placeholder="密码"  />
+                        <input id="password" class="aw-register-pwd form-control" type="password" name="password" placeholder="密码" />
                     </li>
                     <div id='pwd-level'>
                         <span>密码强度:</span>
@@ -80,12 +55,13 @@
                     </div>
                     <hr/>
                     <li class="aw-register-verify">
-                        <img class="pull-right" width="120" src="">
-                        <input type="text" class="form-control" name="vcode" placeholder="验证码" />
+                        <img class="pull-right" width="120" src="/user/get-pic" onclick=" this.src = '/user/get-pic?' + Date.now() ">
+                        <input type="text" class="form-control" name="v_code" placeholder="验证码" />
                     </li>
                     <li class="last">
                         <label>
-                            <input type="checkbox" checked="checked" value="agree" /> 我同意</label> <a href="javascript:;" class="aw-agreement-btn">用户协议</a>
+                            <input type="checkbox" checked="checked" value="agree" /> 我同意</label>
+                        <a href="javascript:;" class="aw-agreement-btn">用户协议</a>
                         <a href="/login" class="pull-right">已有账号?</a>
                         <div class="aw-regiter-agreement hide">
                             <div class="aw-register-agreement-txt" id="register_agreement"></div>
@@ -100,12 +76,97 @@
             </form>
         </div>
     </div>
-    <div class="aw-footer-wrap">
-        <div class="aw-footer">
-            Copyright © 2016, All Rights Reserved</span>
-            <span class="hidden-xs">Powered By <a href="http://www.itcast.cn" target="blank">ITcast</a></span>
-        </div>
-    </div>
+    {{include './particals/footer.html'}}
+    <script>
+        // input事件
+        $('#name').on('input', delay());
+
+        function delay() {
+            var last = Date.now();
+            function send() {
+                if ($('#name').val() == '') return;
+                $.ajax({
+                    type: 'post',
+                    url: '/api/check-user',
+                    data: 'username=' + $('#name').val(),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(1);
+                        if (data.code == '001') {
+                            $('#msg').text(data.msg);
+                        } else {
+                            $('#msg').text(data.msg);
+                        }
+
+                    }
+                })
+            }
+            return function () {
+                var current = Date.now();
+                clearTimeout(timer);
+                if (current - last > 1000) {
+                    var timer = setTimeout(send, 1000);
+                    last = current;
+                } else {
+                    var timer = setTimeout(send, 1000);
+                }
+            }
+
+        }
+        // 密码强度显示
+        $('#password').on('keyup', function () {
+
+            var pwd = $(this).val();
+            // 判断是否全数字
+            var regex1 = /[0-9]/;
+            // 判断有英文字母
+            var regex2 = /[a-zA-Z]/;
+            // 判断特殊符号
+            var regex3 = /[\W]/;
+
+            // 正则匹配进行判断
+            var level = 0;
+            if(regex1.test(pwd)) level++;
+            if(regex2.test(pwd)) level++;
+            if(regex3.test(pwd)) level++;
+
+            // 设置级别yanse
+            var color = ['pink', 'hotpink', 'red'];
+            var divs = $('#pwd-level').find('div');
+            for (var i = 0; i< divs.length; i++) {
+                divs[i].style.backgroundColor = '';
+            }
+            for(var i = 0; i< level; i++){
+                divs[i].style.backgroundColor = color[i]
+            }
+        })
+
+        // 表单提交
+        $('#register_form').on('submit', function (e) {
+            // 阻止默认事件
+            e.preventDefault();
+            var data = $(this).serialize();
+            // data为键值对形式
+            $.ajax({
+                type: 'post',
+                url: '/api/do-register',
+                data: data,
+                dataType: 'json',
+                success: function (data) {
+                    if(data.code == '001') {
+                        if(confirm('去登录?')){
+                            location.href = '/user/login';
+                        }
+                        return;
+                    }else {
+                        $('#msg').text(data.msg);
+                    }
+                }
+            })
+        })
+
+
+    </script>
 </body>
 
 </html>

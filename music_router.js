@@ -6,4 +6,5 @@ let router = express.Router();
 
 router.get('/add-music',musicController.showAddMusic)
 .get('/list-music', musicController.showListMusic)
-module.exports = router;
+.get('/edit-music/:id', musicController.showEdit )
+module.exports = router; 

@@ -1,6 +1,8 @@
 'use strict';
 // 引入数据库操作对象db
 const db = require('../models/db.js');
+// 引入生成二维码的对象
+const captchapng = require('captchapng2');
 let userController = {
 
 }
@@ -63,6 +65,7 @@ userController.doRegister =  (req, res, next) => {
      let email = req.body.email;
     // 2 处理数据
     // 2.1 验证验证码（暂时不处理）
+    console.log(req.session.v_code);
     // 2.2 验证邮箱
     let regex = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
     if(!regex.test(email)) {

@@ -184,5 +184,16 @@ musicController.showListMusic = (req,res, next) => {
     })
 
 }
+musicController.showEdit = (req, res, next) => {
+    let musicId = req.params.id;
+    console.log(musicId);
+    // 根据音乐id查询数据库
+    db.query('select * from musics where id=?', [musicId], (err, datas) => {
+        // console.log(datas)
+        res.render('edit.html', {
+            musics: datas[0]
+        })
+    })
+}
 //向外导出
 module.exports = musicController;

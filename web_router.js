@@ -21,7 +21,7 @@ router.get('/get', userController.doTest)
 .post('/add-music', musicController.addMusic)
 
 // 编辑音乐
-.put('/update-music',musicController.updateMusic)
+.put('/edit-music',musicController.updateMusic)
 
 // 删除音乐
 .delete('/del-music', musicController.delMusic)
